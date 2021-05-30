@@ -9,6 +9,8 @@ import argparse
 import shutil
 
 
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--imgdir", type=str, required=True, help="File containing the image paths")
 parser.add_argument("-l", "--labeldir", type=str, required=True, help="labels path")
@@ -17,13 +19,12 @@ parser.add_argument("-t", "--targetdir", type=str, required=True, help="Dir wher
 args = parser.parse_args()
 
 img_dir = args.imgdir
-label_dir =  args.labeldir
+label_dir =  args.labeldir + '*.txt'
 target_dir = args.targetdir
 
 if (not os.path.exists(target_dir)):
     os.mkdir(target_dir)
     
-
 print(img_dir)
 print(label_dir)
 print(target_dir)
@@ -32,6 +33,7 @@ print(target_dir)
 
 label_list = glob.glob(label_dir)
 num='02'
+print(len(label_list))
 # no index: Original
 # index 00: Affine, Snowflakes
 # index 01: Multiply, Perspective, Picewise, Elastic, Affine
@@ -50,13 +52,13 @@ def convert_bbs_back_to_yolo(x1,y1,x2,y2,label):
 
 for label in label_list:
     base = os.path.basename(label)
-    if base == 'classesFilt.txt':
+    if base == './classesFilt.txt':
         #print(base)
         continue
-    
+
     try:
-        img_dir = img_dir+os.path.splitext(base)[0]+'.jpg'
-        img = imread(img_dir)
+        imgs = img_dir+os.path.splitext(base)[0]+'.jpg'
+        img = imread(imgs)
     except:
         #print(base)
         continue
@@ -84,7 +86,8 @@ for label in label_list:
                     rotate=np.random.normal(loc=0,scale=5),
                     mode='edge'
                     ),
-            iaa.RemoveSaturation(),
+            iaa.Grayscale(alpha=1.0),
+            #iaa.RemoveSaturation(),
             iaa.Fliplr()
         ])
         ''' seq = iaa.Sequential([
