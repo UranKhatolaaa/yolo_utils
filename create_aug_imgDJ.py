@@ -5,10 +5,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import glob
+import argparse
+import shutil
 
 
-img_dir = '/Users/diwaker/Documents/INDIA/productDev/yolo_utils/final_set/train/images/'
-label_dir = '/Users/diwaker/Documents/INDIA/productDev/yolo_utils/final_set/train/images/*.txt'
+parser = argparse.ArgumentParser()
+parser.add_argument("-i", "--imgdir", type=str, required=True, help="File containing the image paths")
+parser.add_argument("-l", "--labeldir", type=str, required=True, help="labels path")
+parser.add_argument("-t", "--targetdir", type=str, required=True, help="Dir where to create augmented images and their annotations"
+                                                                       "will be created of does not exists")
+args = parser.parse_args()
+
+img_dir = args.imgdir
+label_dir =  args.labeldir
+target_dir = args.targetdir
+
+if (not os.path.exists(target_dir)):
+    os.mkdir(target_dir)
+    
+
+print(img_dir)
+print(label_dir)
+print(target_dir)
+#img_dir = '/Users/diwaker/Documents/INDIA/productDev/yolo_utils/final_set/train/images/'
+#label_dir = '/Users/diwaker/Documents/INDIA/productDev/yolo_utils/final_set/train/images/*.txt'
+
 label_list = glob.glob(label_dir)
 num='02'
 # no index: Original
@@ -34,7 +55,7 @@ for label in label_list:
         continue
     
     try:
-        img_dir = '/Users/diwaker/Documents/INDIA/productDev/yolo_utils/final_set/train/images/'+os.path.splitext(base)[0]+'.jpg'
+        img_dir = img_dir+os.path.splitext(base)[0]+'.jpg'
         img = imread(img_dir)
     except:
         #print(base)
@@ -104,7 +125,7 @@ for label in label_list:
         name = os.path.splitext(base)[0]+'_'+num+'_'+str(repeat)
         #print(name)
         # name = os.path.splitext(base)[0]
-        directory = '/Users/diwaker/Documents/INDIA/productDev/yolo_utils/final_set_imgaug/train/images/'
+        directory = target_dir
         imsave(directory+name+'.jpg',image_aug)
         np.savetxt(directory+name+'.txt',bbs_yolo_save, fmt=['%d', '%0.6f','%0.6f','%0.6f','%0.6f'])
         print(directory+name+'.jpg')
