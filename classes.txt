@@ -1,0 +1,3 @@
+fireSmoke
+person
+weapon
